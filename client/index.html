@@ -29,7 +29,9 @@
   </div>
 
   <script>
-    const WS_URL = 'ws://localhost:3001';
+    const WS_URL = location.host
+      ? (location.protocol === 'https:' ? `wss://${location.host}` : `ws://${location.host}`)
+      : 'ws://localhost:3001';
 
     function go(message) {
       const ws = new WebSocket(WS_URL);

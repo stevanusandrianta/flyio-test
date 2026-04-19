@@ -1,4 +1,6 @@
-import { createServer } from 'http';
+import { createServer, IncomingMessage, ServerResponse } from 'http';
+import { readFile } from 'fs';
+import { join, extname } from 'path';
 import { WebSocketServer, WebSocket } from 'ws';
 import { ClientMessage } from './types';
 import {
@@ -22,10 +24,31 @@ import {
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3001;
 
-const server = createServer((req, res) => {
-  res.writeHead(200, { 'Content-Type': 'text/plain' });
-  res.end('Big 2 server running');
-});
+const CLIENT_DIR = process.env.CLIENT_DIR ?? join(__dirname, '..', '..', 'client');
+
+const MIME: Record<string, string> = {
+  '.html': 'text/html',
+  '.js':   'application/javascript',
+  '.css':  'text/css',
+};
+
+function serveStatic(req: IncomingMessage, res: ServerResponse): void {
+  const url = req.url === '/' ? '/index.html' : (req.url ?? '/index.html');
+  const filePath = join(CLIENT_DIR, url.split('?')[0]);
+  const mime = MIME[extname(filePath)] ?? 'text/plain';
+
+  readFile(filePath, (err, data) => {
+    if (err) {
+      res.writeHead(404);
+      res.end('Not found');
+    } else {
+      res.writeHead(200, { 'Content-Type': mime });
+      res.end(data);
+    }
+  });
+}
+
+const server = createServer(serveStatic);
 
 const wss = new WebSocketServer({ server });
 

@@ -1,4 +1,6 @@
-const WS_URL = 'ws://localhost:3001';
+const WS_URL = location.host
+  ? (location.protocol === 'https:' ? `wss://${location.host}` : `ws://${location.host}`)
+  : 'ws://localhost:3001';
 
 const SUIT_SYMBOL = { D: '♦', C: '♣', H: '♥', S: '♠' };
 const SUIT_CLASS = { D: 'd', C: 'c', H: 'h', S: 's' };

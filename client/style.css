@@ -1,0 +1,106 @@
+/* Reset & base */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: system-ui, sans-serif; background: #1a5c2a; color: #fff; min-height: 100vh; }
+
+/* Suit colors */
+.d, .h { color: #e74c3c; }
+.c, .s { color: #1a1a1a; }
+
+/* --- LOBBY --- */
+.lobby {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; min-height: 100vh; gap: 24px; padding: 24px;
+}
+.lobby h1 { font-size: 3rem; letter-spacing: 2px; }
+.lobby h1 .suit { font-size: 2.5rem; }
+.card-box {
+  background: #fff; color: #111; border-radius: 12px; padding: 24px;
+  display: flex; flex-direction: column; gap: 12px; width: 320px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+}
+.card-box h2 { font-size: 1.2rem; }
+input {
+  padding: 10px 14px; border: 1.5px solid #ccc; border-radius: 8px;
+  font-size: 1rem; outline: none;
+}
+input:focus { border-color: #1a5c2a; }
+button {
+  padding: 10px 20px; background: #1a5c2a; color: #fff;
+  border: none; border-radius: 8px; font-size: 1rem;
+  cursor: pointer; font-weight: 600; transition: background 0.15s;
+}
+button:hover:not(:disabled) { background: #2d7a40; }
+button:disabled { background: #999; cursor: not-allowed; }
+.divider { color: #ccc; font-size: 0.9rem; }
+.error { color: #e74c3c; font-weight: 600; font-size: 0.9rem; }
+.hidden { display: none !important; }
+
+/* --- GAME PAGE --- */
+.game-page { display: grid; grid-template-rows: auto auto 1fr auto; height: 100vh; }
+
+header {
+  background: rgba(0,0,0,0.3); padding: 12px 20px;
+  display: flex; align-items: center; gap: 16px;
+}
+#room-code-display {
+  font-weight: 700; font-size: 1.1rem;
+  background: rgba(255,255,255,0.15); padding: 4px 12px; border-radius: 20px;
+}
+#status-msg { flex: 1; text-align: center; font-weight: 600; }
+#start-btn { padding: 8px 20px; font-size: 0.95rem; }
+
+/* Players bar */
+#players-bar {
+  display: flex; gap: 12px; padding: 10px 20px; background: rgba(0,0,0,0.2);
+  flex-wrap: wrap;
+}
+.player-chip {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.1); border-radius: 20px; padding: 4px 14px;
+  font-size: 0.9rem;
+}
+.player-chip.me { background: rgba(255,215,0,0.25); border: 1.5px solid gold; }
+.card-count { opacity: 0.7; font-size: 0.8rem; }
+.rank { font-weight: 700; color: gold; }
+
+/* Table */
+#table {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 16px; padding: 24px; overflow: hidden;
+}
+#last-play-label { opacity: 0.8; font-size: 0.95rem; }
+
+/* Card rows */
+.card-row { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+
+/* Individual card */
+.card {
+  width: 64px; height: 90px;
+  background: #fff; border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  cursor: pointer; user-select: none;
+  transition: transform 0.12s, box-shadow 0.12s;
+  border: 2px solid transparent;
+  position: relative;
+}
+.card .rank { font-size: 1.1rem; font-weight: 700; line-height: 1; }
+.card .suit { font-size: 1.3rem; line-height: 1; }
+.card:hover { transform: translateY(-6px); }
+.card.selected {
+  transform: translateY(-12px);
+  border-color: gold;
+  box-shadow: 0 6px 20px rgba(255,215,0,0.5);
+}
+
+/* Footer / hand */
+footer {
+  background: rgba(0,0,0,0.35); padding: 16px 20px;
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+}
+#hand-label { font-size: 0.85rem; opacity: 0.7; }
+#action-bar { display: flex; gap: 16px; }
+#play-btn { background: #27ae60; min-width: 100px; }
+#pass-btn { background: #c0392b; min-width: 100px; }
+#game-error { color: #ff6b6b; font-weight: 600; font-size: 0.9rem; min-height: 1.2em; }

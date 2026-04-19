@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Big 2 — Game</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="game-page">
+
+  <!-- Header -->
+  <header>
+    <span id="room-code-display"></span>
+    <span id="status-msg">Waiting for players…</span>
+    <button id="start-btn" class="hidden">Start Game</button>
+  </header>
+
+  <!-- Players info bar -->
+  <div id="players-bar"></div>
+
+  <!-- Table (last played hand) -->
+  <div id="table">
+    <div id="last-play-label">No cards played yet</div>
+    <div id="last-play-cards" class="card-row"></div>
+  </div>
+
+  <!-- Your hand -->
+  <footer>
+    <div id="hand-label">Your hand</div>
+    <div id="hand" class="card-row"></div>
+    <div id="action-bar">
+      <button id="play-btn" disabled>Play</button>
+      <button id="pass-btn" disabled>Pass</button>
+    </div>
+    <div id="game-error" class="error hidden"></div>
+  </footer>
+
+  <script src="game.js"></script>
+</body>
+</html>

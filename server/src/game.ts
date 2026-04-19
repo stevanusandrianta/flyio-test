@@ -5,7 +5,7 @@ import { beats } from './engine/ranking';
 
 export function startGame(room: Room): void {
   const deck = shuffle(createDeck());
-  const hands = deal(deck, 4);
+  const hands = deal(deck, room.players.length);
 
   room.phase = 'playing';
   room.lastPlay = null;

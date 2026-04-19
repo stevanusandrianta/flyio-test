@@ -57,6 +57,9 @@ const wss = new WebSocketServer({ server });
 // Map ws → playerId for disconnect handling
 const wsToPlayer = new Map<WebSocket, string>();
 
+// Grace period before removing a player — gives time for index.html → game.html navigation
+const disconnectTimers = new Map<string, ReturnType<typeof setTimeout>>();
+
 wss.on('connection', (ws) => {
   ws.on('message', (raw) => {
     let msg: ClientMessage;
@@ -113,6 +116,9 @@ wss.on('connection', (ws) => {
 
       case 'rejoin': {
         if (!msg.playerId || !msg.roomCode) return;
+        // Cancel pending disconnect timer
+        const pendingTimer = disconnectTimers.get(msg.playerId);
+        if (pendingTimer) { clearTimeout(pendingTimer); disconnectTimers.delete(msg.playerId); }
         const room = getRoom(msg.roomCode);
         if (!room) { send(ws, { type: 'error', message: 'Room not found — server may have restarted' }); return; }
         const player = reassignPlayerWs(msg.playerId, ws);
@@ -142,14 +148,20 @@ wss.on('connection', (ws) => {
 
         startGame(room);
 
+        const startState = publicGameState(room);
+
         // Send each player their hand
         for (const player of room.players) {
           send(player.ws, {
             type: 'game_started',
             hand: player.hand,
-            ...publicGameState(room),
+            ...startState,
           });
         }
+
+        // Signal the leader (holder of 3♦) that it's their turn
+        const leader = room.players[room.currentPlayerIndex];
+        send(leader.ws, { type: 'your_turn', hand: leader.hand, ...startState });
         break;
       }
 
@@ -240,19 +252,23 @@ wss.on('connection', (ws) => {
 
   ws.on('close', () => {
     const playerId = wsToPlayer.get(ws);
-    if (playerId) {
+    wsToPlayer.delete(ws);
+    if (!playerId) return;
+
+    // Wait 8s before removing — allows index.html → game.html navigation to rejoin
+    const timer = setTimeout(() => {
+      disconnectTimers.delete(playerId);
       const room = getRoomByPlayerId(playerId);
-      if (room) {
-        broadcast(room, {
-          type: 'player_joined',
-          players: room.players
-            .filter(p => p.id !== playerId)
-            .map(p => ({ id: p.id, name: p.name })),
-        });
-      }
+      if (!room) return;
+      broadcast(room, {
+        type: 'player_joined',
+        players: room.players
+          .filter(p => p.id !== playerId)
+          .map(p => ({ id: p.id, name: p.name })),
+      });
       removePlayer(playerId);
-      wsToPlayer.delete(ws);
-    }
+    }, 8_000);
+    disconnectTimers.set(playerId, timer);
   });
 });
 

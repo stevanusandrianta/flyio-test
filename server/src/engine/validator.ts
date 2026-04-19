@@ -75,6 +75,11 @@ export function validatePlay(
     }
   }
 
+  // Card count must match the current trick before classifying
+  if (lastPlay && cards.length !== lastPlay.cards.length) {
+    return { valid: false, reason: `Must play ${lastPlay.cards.length} card(s)` };
+  }
+
   const hand = classifyHand(cards);
   if (!hand) {
     return { valid: false, reason: 'Invalid combination' };
@@ -83,11 +88,6 @@ export function validatePlay(
   // Leading a new trick — any valid hand is ok
   if (!lastPlay) {
     return { valid: true, hand };
-  }
-
-  // Must match card count
-  if (cards.length !== lastPlay.cards.length) {
-    return { valid: false, reason: `Must play ${lastPlay.cards.length} card(s)` };
   }
 
   return { valid: true, hand };

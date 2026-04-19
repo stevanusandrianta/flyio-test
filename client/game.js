@@ -36,10 +36,9 @@ function connect() {
   ws = new WebSocket(WS_URL);
 
   ws.onopen = () => {
-    // Rejoin with same identity
     ws.send(JSON.stringify({
-      type: session.isHost ? 'create_room' : 'join_room',
-      playerName: session.players.find(p => p.id === myId)?.name,
+      type: 'rejoin',
+      playerId: session.playerId,
       roomCode: session.roomCode,
     }));
   };
@@ -64,7 +63,22 @@ function handleMessage(msg) {
       myId = msg.playerId;
       isHost = msg.isHost;
       renderPlayers(msg.players);
-      if (isHost) startBtn.classList.remove('hidden');
+      if (msg.gamePhase === 'playing') {
+        // Rejoining mid-game — restore state
+        startBtn.classList.add('hidden');
+        if (msg.hand) { myHand = msg.hand; renderHand(); }
+        updateFromState(msg);
+        const isMyTurn = msg.currentPlayerId === myId;
+        if (isMyTurn) {
+          myTurn = true;
+          statusMsg.textContent = 'Your turn!';
+          playBtn.disabled = false;
+          passBtn.disabled = !msg.lastPlay;
+        }
+      } else {
+        if (isHost) startBtn.classList.remove('hidden');
+        statusMsg.textContent = `${msg.players.length}/4 players in room`;
+      }
       break;
 
     case 'player_joined':

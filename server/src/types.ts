@@ -40,8 +40,9 @@ export interface Room {
 
 // WebSocket message types
 export interface ClientMessage {
-  type: 'create_room' | 'join_room' | 'start_game' | 'play_cards' | 'pass';
+  type: 'create_room' | 'join_room' | 'rejoin' | 'start_game' | 'play_cards' | 'pass';
   playerName?: string;
+  playerId?: string;
   roomCode?: string;
   cardIds?: string[];
 }

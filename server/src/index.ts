@@ -7,7 +7,9 @@ import {
   createRoom,
   joinRoom,
   getRoomByPlayerId,
+  getRoom,
   removePlayer,
+  reassignPlayerWs,
   broadcast,
   send,
 } from './roomManager';
@@ -106,6 +108,26 @@ wss.on('connection', (ws) => {
           type: 'player_joined',
           players: room.players.map(p => ({ id: p.id, name: p.name })),
         }, player.id);
+        break;
+      }
+
+      case 'rejoin': {
+        if (!msg.playerId || !msg.roomCode) return;
+        const room = getRoom(msg.roomCode);
+        if (!room) { send(ws, { type: 'error', message: 'Room not found — server may have restarted' }); return; }
+        const player = reassignPlayerWs(msg.playerId, ws);
+        if (!player) { send(ws, { type: 'error', message: 'Player not found in room' }); return; }
+        wsToPlayer.set(ws, player.id);
+        const state = publicGameState(room);
+        send(ws, {
+          type: 'room_joined',
+          roomCode: room.code,
+          playerId: player.id,
+          isHost: room.hostId === player.id,
+          gamePhase: room.phase,
+          hand: player.hand,
+          ...state,
+        });
         break;
       }
 

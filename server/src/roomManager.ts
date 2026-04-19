@@ -55,6 +55,15 @@ export function getRoom(code: string): Room | undefined {
   return rooms.get(code.toUpperCase());
 }
 
+export function reassignPlayerWs(playerId: string, ws: WebSocket): Player | undefined {
+  const room = getRoomByPlayerId(playerId);
+  if (!room) return undefined;
+  const player = room.players.find(p => p.id === playerId);
+  if (!player) return undefined;
+  player.ws = ws;
+  return player;
+}
+
 export function getRoomByPlayerId(playerId: string): Room | undefined {
   for (const room of rooms.values()) {
     if (room.players.some(p => p.id === playerId)) return room;
